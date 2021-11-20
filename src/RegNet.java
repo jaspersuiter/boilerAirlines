@@ -16,25 +16,30 @@ public class RegNet
         Graph mst = kruskal(G);
 
         //step 2
-        int i = 0;
-        while (mst.totalWeight() > max) {
-            int last = mst.sortedEdges().size();
-            Edge e = mst.sortedEdges().get(last - 1 - i);
+        int last = mst.sortedEdges().size();
 
-            if (isConn(mst, e)) {
-                mst.removeEdge(e);
+        for (int i = last - 1; i > 0; i--) {
+            if (mst.totalWeight() > max) {
+                String u = mst.sortedEdges().get(i).u;
+                String v = mst.sortedEdges().get(i).v;
+
+                if (mst.deg(u) == 1) {
+                    mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+                } else if (mst.deg(v) == 1) {
+                    mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+                }
             }
+        }
 
-            i++;
-        } //end while
+        mst = mst.connGraph();
 
         //step 3
 
         //initialize stops to 0
         int[][] stops = new int[mst.V()][mst.V()];
 
-        for (i = 0; i < G.V(); i++) {
-            for (int j = 0; j < G.V(); j++) {
+        for (int i = 0; i < mst.V(); i++) {
+            for (int j = 0; j < mst.V(); j++) {
                stops[i][j] = 0;
             }
 
@@ -42,7 +47,7 @@ public class RegNet
 
         int[][] Distance = AllPairs(mst, stops);
 
-        LinkedList list = stopOrganizer(G.V(), Distance, stops);
+        LinkedList list = stopOrganizer(mst.V(), Distance, stops);
         LinkedList.Node node = list.head;
 
         while (node.next != null) {
