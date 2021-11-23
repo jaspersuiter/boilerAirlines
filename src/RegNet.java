@@ -11,6 +11,7 @@ public class RegNet
     static int counter = 0;
 
 
+
     public static Graph run(Graph G, int max)
     {
 
@@ -35,13 +36,17 @@ public class RegNet
             }
         }
 
+
         mst = mst.connGraph();
-        mst.getCodes();
-        G.getCodes();
+
+        int[][] stops = AllPairs(mst);
+
 
         //step 3
 
-        int[][] stops = AllPairs(mst);
+
+        //boolean[] visited = new boolean[mst.V()];
+        //mst = add(G, mst, max, visited);
 
 
         int c = mst.V() * mst.V();
@@ -110,13 +115,6 @@ public class RegNet
         return T;
     } //end kruskal
 
-    private static boolean isConn(Graph g, Edge e) {
-        Graph dupe = g.subgraph(g.getCodes());
-        dupe.removeEdge(e);
-        dupe = dupe.connGraph();
-
-        return g.V() == dupe.V();
-    } //end isConn
 
     private static int[][] AllPairs(Graph g) {
 
@@ -161,7 +159,7 @@ public class RegNet
 
         if (list.head == null) {
             list.head = node;
-        } else {
+        } else{
             LinkedList.Node last = list.head;
 
             while (last.next != null) {
@@ -175,5 +173,16 @@ public class RegNet
         return list;
     } //end insert
 
+
+//    public static Graph add(Graph og, Graph mst, int max, boolean[] visited) {
+//        int c = 0;
+//        while (c < mst.V()) {
+//            c++;
+//        }
+//
+//        LinkedList.Node node = list.head;
+//
+//        return mst;
+//    }
 
 } //end RegNet
