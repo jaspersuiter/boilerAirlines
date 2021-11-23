@@ -1,3 +1,4 @@
+import java.awt.event.WindowStateListener;
 import java.util.ArrayList;
 
 public class RegNet
@@ -6,10 +7,13 @@ public class RegNet
     //G: the original graph
     //max: the budget
 
+    static LinkedList list = new LinkedList();
+    static int counter = 0;
 
 
-    public static Graph run(Graph G, int max) 
+    public static Graph run(Graph G, int max)
     {
+
 	    //TODO
 
         //step 1
@@ -32,30 +36,52 @@ public class RegNet
         }
 
         mst = mst.connGraph();
+        mst.getCodes();
+        G.getCodes();
 
         //step 3
 
-        //initialize stops to 0
-        int[][] stops = new int[mst.V()][mst.V()];
+        int[][] stops = AllPairs(mst);
 
-        for (int i = 0; i < mst.V(); i++) {
-            for (int j = 0; j < mst.V(); j++) {
-               stops[i][j] = 0;
+
+        int c = mst.V() * mst.V();
+        while (c >= 0) {
+            int maxStops = 0;
+            int stopsI = 0;
+            int stopsJ = 0;
+            for (int i = 0; i < mst.V(); i++) {
+                for (int j = 0; j < mst.V(); j++) {
+                    if (stops[i][j] != 0 && stops[i][j] > maxStops) {
+                        maxStops = stops[i][j];
+                        stopsI = i;
+                        stopsJ = j;
+                    } else if (stops[i][j] != 0 && stops[i][j] == maxStops) {
+                        if (G.getEdgeWeight(stopsI, stopsJ) > G.getEdgeWeight(i, j)) {
+                            maxStops = stops[i][j];
+                            stopsI = i;
+                            stopsJ = j;
+                        }
+                    }
+                }
             }
+            if (G.getEdgeWeight(stopsI, stopsJ) != 0) {
+                list = insert(list, stopsI, stopsJ, G.getEdgeWeight(stopsI, stopsJ));
+                stops[stopsI][stopsJ] = 0;
+                stops[stopsJ][stopsI] = 0;
 
+            }
+            c--;
         }
 
-        int[][] Distance = AllPairs(mst, stops);
 
-        LinkedList list = stopOrganizer(mst.V(), Distance, stops);
+
         LinkedList.Node node = list.head;
-
         while (node.next != null) {
-            if (mst.totalWeight() + G.getEdgeWeight(node.Start, node.End) < max) {
-                mst.addEdge(G.getEdge(node.Start, node.End));
+            if (mst.totalWeight() + node.Weight <= max) {
+                mst.addEdge(node.Start, node.End, node.Weight);
             }
+            node = node.next;
         }
-
 
         return mst;
     }
@@ -92,9 +118,10 @@ public class RegNet
         return g.V() == dupe.V();
     } //end isConn
 
-    private static int[][] AllPairs(Graph g, int[][] stops) {
+    private static int[][] AllPairs(Graph g) {
 
         int[][] D = new int[g.V()][g.V()];
+
 
         for (int i = 0; i < g.V(); i++) {
             for (int j = 0; j < g.V(); j++) {
@@ -111,12 +138,7 @@ public class RegNet
         for (int k = 0; k < g.V(); k++) {
             for (int i = 0; i < g.V(); i++) {
                 for (int j = 0; j < g.V(); j++) {
-                    int a = D[i][k];
-                    int b = D[i][k] + D[k][j];
                     D[i][j] = Math.min(D[i][j], D[i][k] + D[k][j]);
-                    if(a > b) {
-                        stops[i][j] = stops[i][j] + 1;
-                    }
                 }
             }
         }
@@ -124,66 +146,26 @@ public class RegNet
         return D;
     } //end all pairs
 
-    private static LinkedList stopOrganizer(int v, int[][] distance,int[][] stops) {
-        int c = 0;
-        LinkedList list = new LinkedList();
-        LinkedList.Node node = new LinkedList.Node(0, 0, 0);
+    public static LinkedList insert(LinkedList list, int i, int j, int weight) {
+
+        LinkedList.Node node = new LinkedList.Node(i, j, weight);
         node.next = null;
-        list.head = node;
-        LinkedList.Node last = node;
 
-        for (int i = 0; i < v; i++) {
-            for (int j = 0; j < v; j++) {
-                if (stops[i][j] != 0) {
-                    c++;
-                }
-            } //end inner for
-        }
+        if (list.head == null) {
+            list.head = node;
+        } else {
+            LinkedList.Node last = list.head;
 
-        //loops through the array for the amount of times the stops is > 1;
-        //get the path with the largest amount of stops and puts it into a LL
-
-        for (int k = c; k > 0; k--) {
-            LinkedList.Node next = new LinkedList.Node(0, 0, 0);
-            int max = 0;
-            int s = 0;
-            int d = 0;
-            int value = 0;
-            for(int i = 0; i < v; i++){
-                for(int j = 0; j < v; j++) {
-                    int a = stops[i][j];
-                    if (a > max) {
-                        s = i;
-                        d = j;
-                        value = stops[i][j];
-                    }
-                   max = Math.max(stops[i][j], max);
-                }
+            while (last.next != null) {
+                last = last.next;
             }
-            node.Start = s;
-            node.End = d;
-            node.Stops = value;
-            stops[s][d] = 0;
-            node.next = next;
-            last = node;
+
+            last.next = node;
         }
 
-        last = null; //deletes extra node
-
-        //sorts nodes by weight of 1) stops 2) distance
-        while (node.next != null) {
-            if (node.Stops == node.next.Stops) {
-                if (distance[node.Start][node.End] > distance[node.next.Start][node.next.End]) {
-                    LinkedList.Node temp = node;
-                    node = node.next;
-                    node.next = temp;
-                }
-            }
-            node = node.next;
-        }
-
+        counter++;
         return list;
-    } //end organizer
+    } //end insert
 
 
 } //end RegNet
