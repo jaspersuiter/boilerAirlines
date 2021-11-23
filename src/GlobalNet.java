@@ -40,12 +40,11 @@ public class GlobalNet
 
     public static void  regionConnect(Graph one, Graph two) {
         Graph sub = original.subgraph(original.getCodes());
-        sub.setCodes(original.getCodes()); //might be able to delete
+
 
         int idx = sub.index(one.getCode(0));
         dist = new int[original.V()];
-        prev = new int[original.V()];
-        Dijkstra(sub, idx, one);
+        prev = Dijkstra(sub, idx, one);
 
         int vertex = 0;
 
@@ -81,7 +80,7 @@ public class GlobalNet
         edgeList.add(e);
     }
 
-    private static void Dijkstra(Graph g, int s, Graph o) {
+    private static int[] Dijkstra(Graph g, int s, Graph o) {
 
         dist = new int[g.V()];
         int[] prev = new int[g.V()];
@@ -90,7 +89,7 @@ public class GlobalNet
 
         for (int u = 0; u < g.V(); u++) {
             boolean bool = false;
-            if (o.index(o.getCode(u)) != -1) {
+            if (o.index(g.getCode(u)) != -1) {
                 bool = true;
             }
             if (u != s && !bool) {
@@ -115,6 +114,7 @@ public class GlobalNet
             }
         }
 
+        return prev;
     } //end Dijkstra
 
 
