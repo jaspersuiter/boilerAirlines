@@ -143,6 +143,14 @@ public class RegNet
             }
         }
 
+        for (int i = 0; i < g.V(); i++) {
+            for (int j = 0; j < g.V(); j++) {
+                if (D[i][j] == 1) {
+                    D[i][j] = 0;
+                }
+            }
+        }
+
         return D;
     } //end all pairs
 
