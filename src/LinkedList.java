@@ -5,13 +5,13 @@ public class LinkedList {
         static class Node {
             int Start;
             int End;
-            int Weight;
+            int Dist;
             Node next;
 
-            Node(int s, int e, int weight) {
+            Node(int s, int e, int dist) {
                 Start = s;
                 End = e;
-                Weight= weight;
+                Dist = dist;
                 next = null;
             }
 

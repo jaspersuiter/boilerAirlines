@@ -19,9 +19,11 @@ public class GlobalNet
         connect();
         O.connGraph();
         Graph mst = new Graph(O.V());
+        O.connGraph();
         mst.setCodes(O.getCodes());
         for (int i = 0; i < edgeList.size(); i++) {
             mst.addEdge(edgeList.get(i));
+            mst = mst.connGraph();
         }
         return mst.connGraph();
     }
@@ -46,14 +48,15 @@ public class GlobalNet
         dist = new int[original.V()];
         prev = Dijkstra(sub, idx, one);
 
+        int min = Integer.MAX_VALUE/2;
         int vertex = 0;
 
 
         for (int i = 0; i < two.V(); i++) {
             idx = original.index(two.getCode(i));
 
-            if (dist[idx] < Integer.MAX_VALUE/2) {
-                int min = dist[idx];
+            if (dist[idx] < min) {
+                min = dist[idx];
                 vertex = idx;
             }
         }
@@ -103,8 +106,12 @@ public class GlobalNet
 
         while (!q.isEmpty()) {
             int u = q.delMin();
-            for (int i = 0; i < g.adj(u).size() - 1; i++) {
-                int w = g.adj(u).get(i);
+            for (int w : g.adj(u)) {
+
+                if (!q.inQueue(w)) {
+                    continue;
+                }
+
                 int d = dist[u] + g.getEdgeWeight(u, w);
                 if (d < dist[w]) {
                     dist[w] = d;
