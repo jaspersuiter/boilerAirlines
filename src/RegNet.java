@@ -7,22 +7,20 @@ public class RegNet
     //G: the original graph
     //max: the budget
 
-    static LinkedList list = new LinkedList();
     static int counter = 0;
-    static Graph original;
 
 
 
     public static Graph run(Graph G, int max)
     {
+        LinkedList list = new LinkedList();
 
 	    //TODO
-        original = G;
+
         //step 1
         Graph mst = kruskal(G);
 
         //step 2
-
 
         while (mst.totalWeight() > max) {
             int last = mst.sortedEdges().size();
@@ -32,17 +30,20 @@ public class RegNet
                     String v = mst.sortedEdges().get(i).v;
 
                     if (mst.deg(u) == 1) {
-                        mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+                        int start = mst.index(mst.getCode(mst.sortedEdges().get(i).ui()));
+                        int end = mst.index(mst.getCode(mst.sortedEdges().get(i).vi()));
+                        mst.removeEdge(mst.getEdge(start, end));
                         break;
                     } else if (mst.deg(v) == 1) {
-                        mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+                        int start = mst.index(mst.getCode(mst.sortedEdges().get(i).ui()));
+                        int end = mst.index(mst.getCode(mst.sortedEdges().get(i).vi()));
+                        mst.removeEdge(mst.getEdge(start, end));
                         break;
                     }
                 }
             }
         }
         //step 3
-
 
         int[][] stops = AllPairs(mst);
 
@@ -56,11 +57,8 @@ public class RegNet
             }
         }
 
-        sortList(list);
+        sortList(list, G);
 
-
-
-        mst = mst.connGraph();
 
         LinkedList.Node node = list.head;
         while (node.next != null) {
@@ -73,7 +71,7 @@ public class RegNet
         return mst.connGraph();
     }
 
-    public static void sortList(LinkedList list) {
+    public static void sortList(LinkedList list, Graph O) {
 
         LinkedList.Node current = list.head, index = null;
 
@@ -102,8 +100,10 @@ public class RegNet
                     }
 
                     if (current.Dist == index.Dist) {
-                        if (original.getEdgeWeight(original.index(original.getCode(current.Start)), original.index(original.getCode(current.End))) >=
-                                original.getEdgeWeight(original.index(original.getCode(index.Start)), original.index(original.getCode(index.End)))) {
+                        //System.out.printf("S:%d, E:%d W:%d\n", original.index(original.getCode(current.Start)), original.index(original.getCode(current.End)), original.getEdgeWeight(original.index(original.getCode(current.Start)), original.index(original.getCode(current.End))));
+                        int a = O.getEdgeWeight(O.index(O.getCode(current.Start)), O.index(O.getCode(current.End)));
+                        int b = O.getEdgeWeight(O.index(O.getCode(index.Start)), O.index(O.getCode(index.End)));
+                        if (a >= b) {
 
                             tempDist = current.Dist;
                             tempEnd = current.End;

@@ -5,22 +5,22 @@ public class PartATest
 {
     public static void main(String[] args) 
     {
-	    int testNum = 3;
-	    int graphNum = 2;
+	    int testNum = 1;
+	    int graphNum = 1;
 
 	    //Test 1
-//	    int budget = 20;
-//	    runTest(testNum, graphNum, budget);
+	    int budget = 20;
+	    runTest(testNum, graphNum, budget);
 	    
         //Test 2
-//	    budget = 75;
-//	    testNum++;
-//	    runTest(testNum, graphNum, budget);
+	    budget = 75;
+	    testNum++;
+	    runTest(testNum, graphNum, budget);
 	    
         //Test 3
-	    int budget = 100;
-	    //testNum++;
-	    //graphNum++;
+	    budget = 100;
+	    testNum++;
+	    graphNum++;
 	    runTest(testNum, graphNum, budget);
 	    
         //Test 4
