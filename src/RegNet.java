@@ -22,21 +22,25 @@ public class RegNet
         Graph mst = kruskal(G);
 
         //step 2
-        int last = mst.sortedEdges().size();
 
-        for (int i = last - 1; i > 0; i--) {
-            if (mst.totalWeight() > max) {
-                String u = mst.sortedEdges().get(i).u;
-                String v = mst.sortedEdges().get(i).v;
 
-                if (mst.deg(u) == 1) {
-                    mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
-                } else if (mst.deg(v) == 1) {
-                    mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+        while (mst.totalWeight() > max) {
+            int last = mst.sortedEdges().size();
+            for (int i = last - 1; i > 0; i--) {
+                if (mst.totalWeight() > max) {
+                    String u = mst.sortedEdges().get(i).u;
+                    String v = mst.sortedEdges().get(i).v;
+
+                    if (mst.deg(u) == 1) {
+                        mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+                        break;
+                    } else if (mst.deg(v) == 1) {
+                        mst.removeEdge(mst.getEdge(mst.sortedEdges().get(i).ui(), mst.sortedEdges().get(i).vi()));
+                        break;
+                    }
                 }
             }
         }
-
         //step 3
 
 
@@ -44,7 +48,7 @@ public class RegNet
 
         for (int i = 0; i < mst.V(); i++) {
             for (int j = 0; j < mst.V(); j++) {
-                if (stops[i][j] != 0 && stops[i][j] != Integer.MAX_VALUE/2) {
+                if (stops[i][j] != 0) {
                     insert(list, i, j, stops[i][j]);
                     stops[i][j] = 0;
                     stops[j][i] = 0;
@@ -55,6 +59,8 @@ public class RegNet
         sortList(list);
 
 
+
+        mst = mst.connGraph();
 
         LinkedList.Node node = list.head;
         while (node.next != null) {
@@ -174,6 +180,9 @@ public class RegNet
         for (int i = 0; i < g.V(); i++) {
             for (int j = 0; j < g.V(); j++) {
                 if (D[i][j] == 1) {
+                    D[i][j] = 0;
+                }
+                if (D[i][j] == Integer.MAX_VALUE/2) {
                     D[i][j] = 0;
                 }
             }
